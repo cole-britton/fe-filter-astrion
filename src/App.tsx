@@ -1,15 +1,24 @@
-import logo from "./logo.svg";
 import "./App.css";
+import CustomPaginationActionsTable from "./components/DataTableBase/DataTableBase";
+import HeaderBar from "./components/HeaderBar/HeaderBar";
+import MultipleSelectChip from "./components/MultiSelect/MultiSelect";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-      </header>
+    <div className="main-container">
+      <HeaderBar
+        logoSrc="src/astr.png"
+        logoAlt="astrion logo"
+        fullName="Cole Britton"
+        email="cbritton@gmail.com"
+      />
+      <div className="dropdown-container">
+        <MultipleSelectChip />
+        <MultipleSelectChip />
+        <MultipleSelectChip />
+        <MultipleSelectChip />
+      </div>
+      <CustomPaginationActionsTable />
     </div>
   );
 }

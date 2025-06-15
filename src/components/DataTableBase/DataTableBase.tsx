@@ -138,8 +138,28 @@ export default function CustomPaginationActionsTable() {
   };
 
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
+    <TableContainer
+      component={Paper}
+      sx={{
+        boxShadow: 3,
+        borderRadius: 2,
+        maxWidth: 1200,
+      }}
+    >
+      <Table
+        sx={{
+          minWidth: 500,
+
+          "& .MuiTableCell-root": {
+            fontSize: "1rem",
+            color: "#333",
+          },
+          "& .MuiTableRow-root:hover": {
+            backgroundColor: "#f1f1f1",
+          },
+        }}
+        aria-label="custom pagination table"
+      >
         <TableBody>
           {(rowsPerPage > 0
             ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -182,6 +202,15 @@ export default function CustomPaginationActionsTable() {
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
               ActionsComponent={TablePaginationActions}
+              sx={{
+                ".MuiTablePagination-toolbar": {
+                  backgroundColor: "#f5f5f5",
+                },
+                ".MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows":
+                  {
+                    color: "#666",
+                  },
+              }}
             />
           </TableRow>
         </TableFooter>
