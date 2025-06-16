@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Papa from "papaparse";
 import "./App.css";
 import CustomPaginationActionsTable from "./components/DataTableBase/DataTableBase";
@@ -10,10 +10,15 @@ function App() {
   const [tableRows, setTableRows] = useState<any[][]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [numberOptions, setNumberOptions] = useState<string[]>([]);
+  const [selectedNumbers, setSelectedNumbers] = useState<Array<string | number>>([]);
+
+  const handleSelectedNumbersChange = (newSelectedValues: Array<string | number>) => {
+    setSelectedNumbers(newSelectedValues);
+  };
 
   useEffect(() => {
     setLoading(true);
-    fetch("data/dataset_small.csv")
+    fetch("data/dataset_large.csv")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -86,6 +91,30 @@ function App() {
     return <div>Loading data...</div>;
   }
 
+  const numberColumnIndex = useMemo(() => {
+    let idx = tableHeaders.findIndex((h) => h.toLowerCase() === "number");
+    if (idx === -1) {
+      idx = tableHeaders.findIndex((h) => h.toLowerCase() === "numbers");
+    }
+    return idx;
+  }, [tableHeaders]);
+
+  const filteredTableRows = useMemo(() => {
+    if (selectedNumbers.length === 0) {
+      return tableRows;
+    }
+    if (numberColumnIndex === -1) {
+      console.warn("Number column not found, returning all rows.");
+      return tableRows;
+    }
+    return tableRows.filter((row) => {
+      const cellValue = row[numberColumnIndex];
+      // Ensure selectedNumbers are strings for comparison, as numberOptions are strings
+      const selectedNumbersAsStrings = selectedNumbers.map(String);
+      return selectedNumbersAsStrings.includes(String(cellValue));
+    });
+  }, [tableRows, selectedNumbers, numberColumnIndex]);
+
   return (
     <div className="main-container">
       <HeaderBar
@@ -95,7 +124,12 @@ function App() {
         email="cbritton@gmail.com"
       />
       <div className="dropdown-container">
-        <MultipleSelect label="Number" options={numberOptions} />
+        <MultipleSelect
+          label="Number"
+          options={numberOptions}
+          selectedValues={selectedNumbers}
+          onChange={handleSelectedNumbersChange}
+        />
         <MultipleSelect label="Mod3" options={numberOptions} />
         <MultipleSelect label="Mod4" options={numberOptions} />
         <MultipleSelect label="Mod5" options={numberOptions} />
@@ -103,7 +137,7 @@ function App() {
       </div>
       <CustomPaginationActionsTable
         headers={tableHeaders}
-        rows={tableRows}
+        rows={filteredTableRows} // Use filtered rows
         rowsPerPageProp={100}
       />
     </div>
