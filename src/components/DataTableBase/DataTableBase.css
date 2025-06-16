@@ -4,12 +4,12 @@
 }
 
 .MuiTableCell-root {
-  min-width: 40px; /* Set a minimum width for table cells */
-  word-break: break-word; /* Allows long words to break and wrap */
-  padding: 8px 16px; /* Adjust padding as needed */
+  min-width: 40px;
+  word-break: break-word;
+  padding: 8px 16px;
 }
 
 .MuiTableHead-root .MuiTableCell-root {
-  font-weight: bold; /* Make header text bold */
-  background-color: #f0f0f0; /* Light grey background for header */
+  font-weight: bold;
+  background-color: #f0f0f0;
 }

@@ -3,7 +3,6 @@ import Papa from "papaparse";
 import "./App.css";
 import CustomPaginationActionsTable from "./components/DataTableBase/DataTableBase";
 import HeaderBar from "./components/HeaderBar/HeaderBar";
-import AutocompleteBase from "./components/AutoComplete/AutoComplete";
 import AutocompleteBigList from "./components/AutoCompleteBigList/AutoCompleteBigList";
 
 interface filterObject {
@@ -36,7 +35,7 @@ function App() {
 
   useEffect(() => {
     setLoading(true);
-    fetch("data/dataset_small.csv")
+    fetch("data/dataset_large.csv")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -111,18 +110,12 @@ function App() {
         email="cbritton@gmail.com"
       />
       <div className="dropdown-container">
-        <AutocompleteBigList
-          options={filterOptions[0]?.options || []}
-          label={filterOptions[0]?.title || ""}
-          onChange={handleNumbersFilterChange}
-        />
-        {filterOptions.slice(1, 5).map((filter, idx) => (
-          <AutocompleteBase
+        {filterOptions.slice(0, filterOptions.length).map((filter, idx) => (
+          <AutocompleteBigList
             key={idx}
-            options={
-              idx === 0 ? filter.options.slice(0, 10) : filter.options || []
-            }
+            options={filter.options || []}
             label={filter.title || ""}
+            onChange={handleNumbersFilterChange}
           />
         ))}
       </div>
