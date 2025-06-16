@@ -10,6 +10,7 @@ import Typography from "@mui/material/Typography";
 interface AutocompleteBigListProps {
   label: string;
   options: string[];
+  onChange: (event: React.SyntheticEvent, value: string[]) => void;
 }
 
 function renderRow(props: ListChildComponentProps) {
@@ -127,12 +128,15 @@ const StyledPopper = styled(Popper)({
 export default function AutocompleteBigList({
   label = "Select Options",
   options = [],
+  onChange,
 }: AutocompleteBigListProps) {
   return (
     <Autocomplete
       sx={{ width: 250 }}
       disableListWrap
+      multiple
       options={options}
+      onChange={onChange}
       renderInput={(params) => <TextField {...params} label={label} />}
       renderOption={(props, option, state) =>
         [props, option, state.index] as React.ReactNode

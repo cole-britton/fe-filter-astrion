@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Papa from "papaparse";
 import "./App.css";
 import CustomPaginationActionsTable from "./components/DataTableBase/DataTableBase";
@@ -16,6 +16,23 @@ function App() {
   const [tableRows, setTableRows] = useState<any[][]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [filterOptions, setFilterOptions] = useState<filterObject[]>([]);
+  const [selectedNumbersFilter, setSelectedNumbersFilter] = useState<string[]>(
+    []
+  );
+
+  const filteredTableRows = useMemo(() => {
+    if (selectedNumbersFilter.length === 0) {
+      return tableRows;
+    }
+    return tableRows.filter((row) => selectedNumbersFilter.includes(row[0]));
+  }, [tableRows, selectedNumbersFilter]);
+
+  const handleNumbersFilterChange = (
+    _event: React.SyntheticEvent,
+    value: string[]
+  ) => {
+    setSelectedNumbersFilter(value);
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -97,6 +114,7 @@ function App() {
         <AutocompleteBigList
           options={filterOptions[0]?.options || []}
           label={filterOptions[0]?.title || ""}
+          onChange={handleNumbersFilterChange}
         />
         {filterOptions.slice(1, 5).map((filter, idx) => (
           <AutocompleteBase
@@ -110,7 +128,7 @@ function App() {
       </div>
       <CustomPaginationActionsTable
         headers={tableHeaders}
-        rows={tableRows}
+        rows={filteredTableRows}
         rowsPerPageProp={100}
       />
     </div>
