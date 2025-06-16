@@ -1,0 +1,15 @@
+.MuiTableContainer-root {
+  overflow-x: auto;
+  max-width: 1300px;
+}
+
+.MuiTableCell-root {
+  min-width: 40px; /* Set a minimum width for table cells */
+  word-break: break-word; /* Allows long words to break and wrap */
+  padding: 8px 16px; /* Adjust padding as needed */
+}
+
+.MuiTableHead-root .MuiTableCell-root {
+  font-weight: bold; /* Make header text bold */
+  background-color: #f0f0f0; /* Light grey background for header */
+}
