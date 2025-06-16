@@ -1,13 +1,10 @@
 import * as React from "react";
 import { Theme, useTheme } from "@mui/material/styles";
-import Box from "@mui/material/Box";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-import Chip from "@mui/material/Chip";
-import "./MultiSelect.css";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -20,68 +17,62 @@ const MenuProps = {
   },
 };
 
-const names = [
-  "Oliver Hansen",
-  "Van Henry",
-  "April Tucker",
-  "Ralph Hubbard",
-  "Omar Alexander",
-  "Carlos Abbott",
-  "Miriam Wagner",
-  "Bradley Wilkerson",
-  "Virginia Andrews",
-  "Kelly Snyder",
-];
+interface MultipleSelectProps {
+  label: string;
+  options: string[] | number[];
+}
 
-function getStyles(name: string, personName: readonly string[], theme: Theme) {
+function getStyles(
+  option: string | number,
+  selectedValues: readonly (string | number)[],
+  theme: Theme
+) {
   return {
-    fontWeight: personName.includes(name)
+    fontWeight: selectedValues.includes(option)
       ? theme.typography.fontWeightMedium
       : theme.typography.fontWeightRegular,
   };
 }
 
-export default function MultipleSelectChip() {
+export default function MultipleSelect({
+  label,
+  options = [],
+}: MultipleSelectProps) {
   const theme = useTheme();
-  const [personName, setPersonName] = React.useState<string[]>([]);
+  const [selectedValues, setSelectedValues] = React.useState<
+    Array<string | number>
+  >([]);
 
-  const handleChange = (event: SelectChangeEvent<typeof personName>) => {
+  const handleChange = (event: SelectChangeEvent<typeof selectedValues>) => {
     const {
       target: { value },
     } = event;
-    setPersonName(
-      // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value
-    );
+    setSelectedValues(typeof value === "string" ? value.split(",") : value);
   };
+
+  const selectId = `${label.toLowerCase().replace(/\s+/g, "-")}-select`;
+  const labelId = `${label.toLowerCase().replace(/\s+/g, "-")}-label`;
 
   return (
     <div>
-      <FormControl sx={{ m: 1, width: 288, margin: 0 }}>
-        <InputLabel id="demo-multiple-chip-label">Chip</InputLabel>
+      <FormControl sx={{ m: 1, width: 200, margin: 0 }}>
+        <InputLabel id={labelId}>{label}</InputLabel>
         <Select
-          labelId="demo-multiple-chip-label"
-          id="demo-multiple-chip"
+          labelId={labelId}
+          id={selectId}
           multiple
-          value={personName}
+          value={selectedValues}
           onChange={handleChange}
-          input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-          renderValue={(selected) => (
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-              {selected.map((value) => (
-                <Chip key={value} label={value} />
-              ))}
-            </Box>
-          )}
+          input={<OutlinedInput label={label} />}
           MenuProps={MenuProps}
         >
-          {names.map((name) => (
+          {options.map((option) => (
             <MenuItem
-              key={name}
-              value={name}
-              style={getStyles(name, personName, theme)}
+              key={option}
+              value={option}
+              style={getStyles(option, selectedValues, theme)}
             >
-              {name}
+              {option}
             </MenuItem>
           ))}
         </Select>
