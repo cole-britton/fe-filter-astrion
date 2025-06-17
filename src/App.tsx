@@ -35,7 +35,7 @@ function App() {
 
   useEffect(() => {
     setLoading(true);
-    fetch("data/dataset_large.csv")
+    fetch("/data/dataset_large.csv")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -104,7 +104,7 @@ function App() {
   return (
     <div className="main-container">
       <HeaderBar
-        logoSrc="src/astr.png"
+        logoSrc="/astr.png"
         logoAlt="astrion logo"
         fullName="Cole Britton"
         email="cbritton@gmail.com"
