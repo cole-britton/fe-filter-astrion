@@ -18,19 +18,17 @@ code {
   box-sizing: border-box;
 }
 
-/* Ensure html and body don't have default margins/padding */
 html,
 body {
   margin: 0;
   padding: 0;
   width: 100%;
-  overflow-x: hidden; /* Prevents horizontal scrolling */
+  overflow-x: hidden;
 }
 
-/* Root container should be full window width */
 #root {
-  width: 100vw; /* Full viewport width */
-  min-height: 100vh; /* Full viewport height */
+  width: 100vw;
+  min-height: 100vh;
   margin: 0;
   padding: 0;
 }

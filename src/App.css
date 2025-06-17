@@ -9,5 +9,5 @@
   flex-direction: row;
   justify-content: space-between;
   margin-bottom: 20px;
-  width: 1300px; /* Set a fixed width for the dropdown container */
+  width: 1300px;
 }
