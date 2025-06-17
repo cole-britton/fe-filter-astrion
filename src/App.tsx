@@ -4,6 +4,7 @@ import "./App.css";
 import CustomPaginationActionsTable from "./components/DataTableBase/DataTableBase";
 import HeaderBar from "./components/HeaderBar/HeaderBar";
 import AutocompleteBigList from "./components/AutoCompleteBigList/AutoCompleteBigList";
+import DataSizeToggle from "./components/DataSizeToggle/DataSizeToggle";
 
 interface filterObject {
   title: string;
@@ -14,28 +15,102 @@ function App() {
   const [tableHeaders, setTableHeaders] = useState<string[]>([]);
   const [tableRows, setTableRows] = useState<any[][]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [filterOptions, setFilterOptions] = useState<filterObject[]>([]);
-  const [selectedNumbersFilter, setSelectedNumbersFilter] = useState<string[]>(
+  const [baseFilterOptions, setBaseFilterOptions] = useState<filterObject[]>(
     []
   );
+  const [selectedFilters, setSelectedFilters] = useState<{
+    [columnIndex: number]: string[];
+  }>({});
+  const [datasetSize, setDatasetSize] = useState<string>("small");
 
   const filteredTableRows = useMemo(() => {
-    if (selectedNumbersFilter.length === 0) {
+    if (Object.keys(selectedFilters).length === 0) {
       return tableRows;
     }
-    return tableRows.filter((row) => selectedNumbersFilter.includes(row[0]));
-  }, [tableRows, selectedNumbersFilter]);
+    return tableRows.filter((row) => {
+      return Object.entries(selectedFilters).every(
+        ([columnIndexStr, filterValues]) => {
+          const columnIndex = parseInt(columnIndexStr, 10);
+          if (filterValues.length === 0) {
+            return true;
+          }
+          return filterValues.includes(row[columnIndex]);
+        }
+      );
+    });
+  }, [tableRows, selectedFilters]);
 
-  const handleNumbersFilterChange = (
-    _event: React.SyntheticEvent,
-    value: string[]
-  ) => {
-    setSelectedNumbersFilter(value);
+  const dynamicFilterOptions = useMemo(() => {
+    if (baseFilterOptions.length === 0) return [];
+
+    const newOptions: filterObject[] = [];
+
+    newOptions.push({
+      title: baseFilterOptions[0].title,
+      options: baseFilterOptions[0].options,
+    });
+
+    for (
+      let filterIndex = 1;
+      filterIndex < baseFilterOptions.length;
+      filterIndex++
+    ) {
+      const rowsMatchingPreviousFilters = tableRows.filter((row) => {
+        for (
+          let prevFilterIndex = 0;
+          prevFilterIndex < filterIndex;
+          prevFilterIndex++
+        ) {
+          const selections = selectedFilters[prevFilterIndex];
+          if (selections && selections.length > 0) {
+            if (!selections.includes(row[prevFilterIndex])) {
+              return false;
+            }
+          }
+        }
+        return true;
+      });
+
+      const uniqueValues = Array.from(
+        new Set(
+          rowsMatchingPreviousFilters
+            .map((row) => row[filterIndex])
+            .filter(
+              (value) => value !== null && value !== undefined && value !== ""
+            )
+            .map(String)
+        )
+      );
+
+      newOptions.push({
+        title: baseFilterOptions[filterIndex].title,
+        options: uniqueValues,
+      });
+    }
+
+    return newOptions;
+  }, [baseFilterOptions, selectedFilters, tableRows]);
+
+  const handleFilterChange = (columnIndex: number, value: string[]) => {
+    setSelectedFilters((prevFilters) => {
+      const newFilters = { ...prevFilters };
+      newFilters[columnIndex] = value;
+
+      for (let i = columnIndex + 1; i < baseFilterOptions.length; i++) {
+        delete newFilters[i];
+      }
+
+      return newFilters;
+    });
+  };
+
+  const handleDatasetToggleChange = (value: string) => {
+    setDatasetSize(value);
   };
 
   useEffect(() => {
     setLoading(true);
-    fetch("/data/dataset_large.csv")
+    fetch(`/data/dataset_${datasetSize}.csv`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -55,7 +130,6 @@ function App() {
               setTableRows(rowsData);
 
               const allFilterOptions: filterObject[] = [];
-
               for (
                 let columnIndex = 0;
                 columnIndex < headers.length;
@@ -78,10 +152,10 @@ function App() {
                 });
               }
 
-              setFilterOptions(allFilterOptions);
+              setBaseFilterOptions(allFilterOptions);
             } else {
               console.error("Parsed CSV data is empty or invalid.");
-              setFilterOptions([]);
+              setBaseFilterOptions([]);
             }
             setLoading(false);
           },
@@ -95,10 +169,10 @@ function App() {
         console.error("Error fetching CSV:", error);
         setLoading(false);
       });
-  }, []);
+  }, [datasetSize]);
 
   if (loading) {
-    return <div>Loading data...</div>;
+    return <div className="loading-container">Loading data...</div>;
   }
 
   return (
@@ -109,13 +183,20 @@ function App() {
         fullName="Cole Britton"
         email="cbritton@gmail.com"
       />
+      <div className="toggle-container">
+        <DataSizeToggle
+          value={datasetSize}
+          onChange={(_event, value) => handleDatasetToggleChange(value)}
+        />
+      </div>
       <div className="dropdown-container">
-        {filterOptions.slice(0, filterOptions.length).map((filter, idx) => (
+        {dynamicFilterOptions.map((filter, idx) => (
           <AutocompleteBigList
             key={idx}
             options={filter.options || []}
             label={filter.title || ""}
-            onChange={handleNumbersFilterChange}
+            value={selectedFilters[idx] || []}
+            onChange={(_event, value) => handleFilterChange(idx, value)}
           />
         ))}
       </div>

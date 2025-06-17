@@ -10,6 +10,7 @@ import Typography from "@mui/material/Typography";
 interface AutocompleteBigListProps {
   label: string;
   options: string[];
+  value: string[];
   onChange: (event: React.SyntheticEvent, value: string[]) => void;
 }
 
